@@ -31,6 +31,7 @@ class Cuenta{
         this.nombre = nombre;
         this.img = img;
         this.valor = 0.0;
+        this.valorD = 0.0;
     }
 }
 
@@ -86,7 +87,7 @@ const mostrarCuentas = () => {
                         <p id="valorCuenta${cuenta.id}">USD$ ${cuenta.valor}</p>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-12">
-                        <p id="valorCuentaPesos${cuenta.id}">$ ${cuenta.valor}</p>
+                        <p id="valorCuentaPesos${cuenta.id}">$ ${cuenta.valorD}</p>
                     </div>
                 </div>
                 <div class="row">
@@ -117,7 +118,7 @@ const mostrarCuentas = () => {
                 <img src="${cuenta.img}" class="card-img-top imgCuentas" alt="${cuenta.nombre}">
                 <div class="card-body">
                 <h5 class="text-center">${cuenta.nombre}</h5>
-                <p id="valorCuentaPesos${cuenta.id}">$ ${cuenta.valor}</p>
+                <p id="valorCuenta${cuenta.id}">$ ${cuenta.valor}</p>
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12">
                         <form action="" class="text-center">
@@ -270,13 +271,13 @@ const verResumen = (id) =>{
         if(gasto.cuenta === id){
             gastosResumen.push(gasto);
         }
-   })
+   });
 
    ingresos.forEach(ing=>{
     if(ing.cuenta === id){
         ingresosResumen.push(ing);
     }
-   })
+   });
 
    gastosResumen.forEach(gasto=>{
         cuentaResumen = cuentas.find(cuenta => cuenta.id === gasto.cuenta);
@@ -288,7 +289,7 @@ const verResumen = (id) =>{
         </div>
         `
         contenedorResumen.appendChild(card);
-   })
+   });
 
    ingresosResumen.forEach(ing=>{
     cuentaResumen = cuentas.find(cuenta => cuenta.id === ing.cuenta);
@@ -301,39 +302,34 @@ const verResumen = (id) =>{
     `
     contenedorResumen.appendChild(card);
 
-   })
+   });
 
    balanceResumen = document.createElement("div");
    balanceResumen.classList.add("col-lg-12","col-md-12","col-sm-12");
-   if(id===cuentaDolar.id){
-    balance = setInterval(()=>
-    fetch(paginaDolar)
-    .then(response => response.json())
-    .then(({oficial}) => {
-        balance = (calcularBalance(id)).toString();
-        balancePesos = (oficial.price*calcularBalance(id)).toString();
-        balanceResumen.innerHTML=`
-        <p class="text-center">El balance de la cuenta es USD$${balance}</p>
-        <p class="text-center">El balance de la cuenta en Pesos es $${balancePesos}</p>
-       `
-       contenedorResumen.appendChild(balanceResumen);
-    }))
-}
-else{
-    balance = (calcularBalance(id)).toString();
+
+   
+   if(id!=cuentaDolar.id){
+    balanceP = (calcularBalance(id)).toString();
+
     balanceResumen.innerHTML=`
-    <p class="text-center">El balance de la cuenta es $${balance}</p>
-   `
-   contenedorResumen.appendChild(balanceResumen);
-}
+    <p class="text-center">El balance de la cuenta es $${balanceP}</p>
+    `
 
-   if(id===cuentaDolar.id){
-    actualizarImporteCuentaDolar(id);
-}
-else{
-    actualizarImporteCuenta(id);
-}
+    contenedorResumen.appendChild(balanceResumen);
+   }
 
+    else{
+        balance = 
+        fetch(paginaDolar).then(response => response.json()).then(({oficial}) => {
+         balance = (calcularBalance(id)).toString();
+         balancePesos = (oficial.price*calcularBalance(id)).toString();
+         balanceResumen.innerHTML=`
+         <p class="text-center">El balance de la cuenta es USD$${balance}</p>
+         <p class="text-center">El balance de la cuenta en Pesos es $${balancePesos}</p>
+        `
+         contenedorResumen.appendChild(balanceResumen);
+        });
+    }
 }
 
 const calcularBalance = (id) =>{
